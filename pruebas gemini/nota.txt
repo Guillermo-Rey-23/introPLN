@@ -1,0 +1,1 @@
+los archivos mainX.py en realidad los corrí desde el directorio padre de este directorio (en el mismo nivel que estan los .csv)
