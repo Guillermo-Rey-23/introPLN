@@ -25,47 +25,50 @@ def get_sample(dev_headline): # reemplazar
 
 def getLLMResponsesGemini(use_fixed = True, verbose = False):
     responses = []
-    client = genai.Client(api_key="AIzaSyCWi3kfB5AvrIGTqXcXZmQnYrluJMyjlu4")
+    client = genai.Client(api_key="AIzaSyBGHG95z8hnWo-YrUtJdMxja69rW_npM6s")
     for index, dev_headline in enumerate(dev_headlines):
         sample_index = 3
         sample_headline = train_headlines[sample_index]
         sample_classification = train_clickbait[sample_index]
         if not use_fixed:
             sample_index, sample_headline, sample_classification = get_sample(dev_headline)
-        sample = f"""Here is one example: 
+        sample = f"""Aquí hay un ejemplo: 
             "{sample_headline}"
-            Classification: 
+            Clasificación: 
             "{convertir_a_clickbait_o_none(sample_classification)}"
             """
-        prompt = f"""You are a text classification assistant. Your task is to determine whether a news headline uses clickbait or not.
+        
+        print(sample)
+        
+        prompt = f"""Eres un asistente de clasificación de texto. Tu tarea es determinar si el titular de una noticia usa clickbait o no.
 
-        A "clickbait" headline is one that:
-        - Intentionally exaggerates, withholds, or teases information to provoke curiosity or emotional response.
-        - Often uses sensational language, cliffhangers, or vague references ("You won’t believe what happened next").
+        Un titular "clickbait" es uno que:
+        - Exagera intencionalmente, retiene o se burla de la información para provocar curiosidad o una respuesta emocional.
+        - A menudo usa lenguaje sensacionalista, suspenso, o referencias vagas.
 
-        A "non-clickbait" headline is one that:
-        - Clearly states the main information or event.
-        - Avoids exaggeration or withholding details.
+        Un titular "non-clickbait" es uno que:
+        - Expresa claramentela información principal o el evento.
+        - Evita exagerar o retener información.
 
         {sample}
 
-        Classify the following headline strictly as one of these options:
+        Clasifica el siguiente titular estrictamente como una de estas opciones:
         - "CLICKBAIT"
         - "NON-CLICKBAIT"
 
-        Headline:
+        Titular:
         "{dev_headline}"
 
-        Answer with only one word: CLICKBAIT or NON-CLICKBAIT.
+        Responde con solo una palabra: CLICKBAIT or NON-CLICKBAIT.
         """
 
         response = client.models.generate_content(
         model="gemini-2.5-flash-lite", contents=prompt
         )
         response_text = response.candidates[0].content.parts[0].text
-        responses.append((sample_index, index, response_text))
+        responses.append(([sample_index], index, response_text))
         if verbose:
-            print(f"sample-index: {sample_index}\nheadline-index: {index}\nheadline: {dev_headline}\nclassification: {dev_clickbait[index]}\ngemini classification: {response_text}")
+            print(f"sample-indexes: {[sample_index]}\nheadline-index: {index}\nheadline: {dev_headline}\nclassification: {dev_clickbait[index]}\ngemini classification: {response_text}")
             print()
         time.sleep(4.0) # sleep 60 / 15 secs
     return responses
@@ -74,7 +77,7 @@ print(train_headlines[7])
 print(train_headlines[3])
 
 responses = getLLMResponsesGemini(use_fixed=True, verbose=True)
-file_name = "output.json"
+file_name = "output1.json"
 try:
     # 1. Open the file in write mode ('w')
     with open(file_name, 'w') as outfile:
